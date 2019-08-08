@@ -1,23 +1,27 @@
 <template>
     <div>
-        <el-card class="box-card" shadow="hover">
-            <div slot="header" class="clearfix">
-                <span>Request 参数</span>
+        <el-card class="box-card toggle-body-card" :class="showBody?'':'closed'" shadow="hover">
+            <div slot="header" class="toggle-body-header" @click="showBody=!showBody">
+                <i :class="showBody?'el-icon-minus':'el-icon-plus'"></i>
+                <span>请求参数</span>
             </div>
-            <div>
+            <div v-if="showBody">
                 <div v-if="ps && ps.length > 0">
                     <template v-for="(param, idx) in ps">
                         <div :key="idx">
                             <h3>参数来源: {{param.Type}}</h3>
                             <el-form label-width="250px" style="width: 100%" :rules="rules">
-                                <el-form-item v-for="(field, fieldIdx) in param.Fields" :key="fieldIdx">
+                                <el-form-item v-for="(field, fieldIdx) in param.Fields" :key="fieldIdx"
+                                              :prop="field.Name">
                                     <span slot="label">
                                         <span>{{field.Name}}</span>
                                         <span class="field-kind">{{field.Kind}}</span>
                                     </span>
                                     <template v-if="field.Kind==='string'">
-                                        <el-input v-model="field.Value"></el-input>
+                                        <el-input v-model="field.Value" class="param-input"></el-input>
                                     </template>
+                                    <el-button type="text" v-if="field.Condition" @click="openDialog(field.Condition)" class="param-desc">验证数据</el-button>
+                                    <span class="param-desc">{{field.Desc}}</span>
                                 </el-form-item>
                             </el-form>
                         </div>
@@ -26,6 +30,12 @@
                 <span v-else>无任何参数</span>
             </div>
         </el-card>
+        <el-dialog
+                title="后端验证器数据"
+                :visible.sync="dialogVisible"
+                width="60%">
+            <pre v-html="marshal_body(condition)" class="json-container"></pre>
+        </el-dialog>
     </div>
 </template>
 
@@ -33,9 +43,12 @@
     export default {
         name: "params",
         props: ["params"],
-        data(){
+        data() {
             return {
                 rules: {},
+                dialogVisible: false,
+                showBody: true,
+                condition: null,
             }
         },
         computed: {
@@ -64,7 +77,7 @@
                 }
             }
         },
-        methods:{
+        methods: {
             addRule(field, rule) {
                 if (!this.rules[field]) {
                     this.$set(this.rules, field, [])
@@ -74,11 +87,15 @@
             alwaysChecked(rule, value, callback) {
                 callback()
             },
+            openDialog(condition) {
+                this.condition = condition;
+                this.dialogVisible = true;
+            }
         },
     }
 </script>
 
-<style scoped>
+<style>
     .field-kind {
         color: #aa55a1;
         font-size: 12px;

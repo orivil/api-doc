@@ -1,0 +1,32 @@
+.param-input.el-input {
+    width: 40%;
+}
+.param-desc {
+    margin-left: 20px;
+    color: #959795;
+}
+.param-desc.el-button {
+    margin: 0 20px;
+}
+.json-container{
+    background: #2f2f2f;
+    border-radius: 6px;
+    padding: 20px;
+}
+.toggle-body-card .el-card__header{
+    padding: 0;
+}
+.toggle-body-card.closed .el-card__body {
+    padding: 0;
+}
+.toggle-body-card.closed .el-card__header{
+    border-bottom: none;
+}
+.toggle-body-header{
+    cursor: pointer;
+    margin: 0;
+    padding: 20px
+}
+.toggle-body-header i{
+    margin-right: 10px;
+}

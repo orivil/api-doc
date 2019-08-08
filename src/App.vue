@@ -63,8 +63,14 @@
                                                             </div>
                                                         </template>
                                                     </template>
-                                                    <div class="param-container">
+                                                    <div class="toggle-container">
                                                         <params :params="act.Params"></params>
+                                                    </div>
+                                                    <div class="toggle-container">
+                                                        <responses :resps="act.Responses"></responses>
+                                                    </div>
+                                                    <div class="toggle-container">
+                                                        <executes :action="act" :middles="getMiddles(act.Middles)"></executes>
                                                     </div>
                                                 </el-collapse-item>
                                             </el-collapse>
@@ -90,6 +96,12 @@
                                                         <span class="middle-desc">{{middle.Desc}}</span>
                                                     </template>
                                                 </template>
+                                                <div class="toggle-container">
+                                                    <params :params="middle.Params"></params>
+                                                </div>
+                                                <div class="toggle-container">
+                                                    <responses :resps="middle.Responses"></responses>
+                                                </div>
                                             </el-collapse-item>
                                         </el-collapse>
                                     </div>
@@ -109,12 +121,16 @@
 <script>
     import multiMenu from "@/components/multi-menu"
     import params from "@/components/params"
+    import responses from "@/components/responses"
+    import executes from "@/components/executes"
 
     export default {
         name: 'app',
         components: {
             "multi-menu": multiMenu,
             "params": params,
+            "responses": responses,
+            "executes": executes,
         },
         data() {
             return {
@@ -125,6 +141,12 @@
                 ready: false,
                 activeMiddle:"",
             }
+        },
+        watch:{
+            addr(val, oldVal){//普通的watch监听
+                let m = val.match(/^http[s]*:\/\/[^/]+/);
+                this.$axios.defaults.baseURL = m ? m[0] : "";
+            },
         },
         methods: {
             tagType(method) {
@@ -224,6 +246,13 @@
                 } else {
                     this.activeMiddle = middle
                 }
+            },
+            getMiddles(middleNames) {
+                let middles = [];
+                for(let middle of middleNames) {
+                    middles.push(this.doc.Middles[middle])
+                }
+                return middles
             }
         }
     }
@@ -301,7 +330,7 @@
     .tag-title {
         margin: 60px 0 20px 0;
     }
-    .param-container{
+    .toggle-container{
         padding: 10px;
     }
 </style>
