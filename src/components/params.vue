@@ -17,8 +17,11 @@
                                         <span>{{field.Name}}</span>
                                         <span class="field-kind">{{field.Kind}}</span>
                                     </span>
-                                    <template v-if="field.Kind==='string'">
+                                    <template v-if="field.input_type==='common'">
                                         <el-input v-model="field.Value" class="param-input"></el-input>
+                                    </template>
+                                    <template v-if="field.input_type==='bool'">
+                                        <el-switch v-model="field.Value"></el-switch>
                                     </template>
                                     <el-button type="text" v-if="field.Condition" @click="openDialog(field.Condition)" class="param-desc">验证数据</el-button>
                                     <span class="param-desc">{{field.Desc}}</span>
@@ -73,6 +76,7 @@
                                 });
                             }
                         }
+                        field.input_type = this.inputType(field.Kind)
                     }
                 }
             }
@@ -90,6 +94,33 @@
             openDialog(condition) {
                 this.condition = condition;
                 this.dialogVisible = true;
+            },
+            inputType(kind) {
+                switch (kind) {
+                    case "bool":
+                    case "time":
+                    case "file":
+                    case "invalid":
+                        return kind;
+                    case "string":
+                    case "int":
+                    case "int32":
+                    case "int64":
+                    case "float32":
+                    case "float64":
+                        return "common";
+                    case "[]string":
+                    case "[]int":
+                    case "[]int32":
+                    case "[]int64":
+                    case "[]float32":
+                    case "[]float64":
+                        return "slice-common";
+                    case "[]bool":
+                        return "slice-bool";
+                    default:
+                        return "invalid";
+                }
             }
         },
     }

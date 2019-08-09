@@ -17,21 +17,17 @@
                                 <div class="request-title">
                                     <h4 style="margin: 0">
                                         <span class="method">{{request.method}}</span>
+                                        <span class="url">{{request.url}}</span>
                                     </h4>
                                 </div>
                             </template>
                             <div style="padding: 20px">
-                                <div>
-                                    <h3>URL</h3>
-                                    <span class="url">{{request.url}}</span>
-                                </div>
                                 <div v-if="request.headers||request.data">
                                     <h3>请求数据: </h3>
                                     <el-table
                                             :data="[request]"
                                             style="width: 100%">
                                         <el-table-column
-                                                align="center"
                                                 label="Header"
                                                 width="700">
                                             <template slot-scope="scope">
@@ -39,7 +35,6 @@
                                             </template>
                                         </el-table-column>
                                         <el-table-column
-                                                align="center"
                                                 label="Body">
                                             <template slot-scope="scope">
                                                 <pre v-html="marshal_body(scope.row.data)" class="response-body"></pre>
@@ -53,7 +48,6 @@
                                             :data="[request.response]"
                                             style="width: 100%">
                                         <el-table-column
-                                                align="center"
                                                 label="Code"
                                                 width="100">
                                             <template slot-scope="scope">
@@ -61,7 +55,6 @@
                                             </template>
                                         </el-table-column>
                                         <el-table-column
-                                                align="center"
                                                 label="Header"
                                                 width="600">
                                             <template slot-scope="scope">
@@ -69,7 +62,6 @@
                                             </template>
                                         </el-table-column>
                                         <el-table-column
-                                                align="center"
                                                 label="Body">
                                             <template slot-scope="scope">
                                                 <pre v-html="marshal_body(scope.row.data)" class="response-body"></pre>

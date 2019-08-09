@@ -123,7 +123,6 @@
     import params from "@/components/params"
     import responses from "@/components/responses"
     import executes from "@/components/executes"
-
     export default {
         name: 'app',
         components: {
@@ -195,6 +194,8 @@
                 cb(res);
             },
             getData() {
+                this.ready = false;
+                // Object.assign(this.$data, initData());
                 let addrs = this.getLocalAddrs();
                 for (let idx = 0, ln = addrs.length; idx < ln; idx++) {
                     if (addrs[idx] === this.addr) {
@@ -208,8 +209,9 @@
                     if (resp && resp.data) {
                         let data = resp.data;
                         if (data.doc) {
-                            this.initTags(data.doc.Actions, data.doc.Tags, null);
+                            let rootTags = this.initTags(data.doc.Actions, data.doc.Tags, null);
                             this.doc = data.doc;
+                            this.rootTags = rootTags;
                             this.ready = true;
                         }
                     }
@@ -219,17 +221,19 @@
                 location.href = "#" + index;
             },
             initTags(actions, tags) {
+                let rootTags = [];
                 for (let idx = 0, ln = tags.length; idx < ln; idx++) {
                     let tagID = tags[idx].ID;
                     let tag = tags[idx];
                     if (tag.Subs) {
-                        this.initTags(actions, tag.Subs)
+                        rootTags = rootTags.concat(this.initTags(actions, tag.Subs))
                     } else {
                         let tagActs = actions[tagID];
                         tag.actions = tagActs ? tagActs : [];
-                        this.rootTags.push(tag)
+                        rootTags.push(tag)
                     }
                 }
+                return rootTags
             },
             getSortName(name) {
                 let matches = name.match(/\b(\w)/g);
