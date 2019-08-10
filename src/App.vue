@@ -49,17 +49,21 @@
                                                                   :key="tagKey+'-'+actIdx">
                                                     <template slot="title">
                                                         <template>
-                                                            <el-tag :type="tagType(act.Method)" class="route-method">
-                                                                {{act.Method}}
-                                                            </el-tag>
-                                                            <span class="route">{{act.Route}}</span>
-                                                            <div style="width: 100%">
-                                                                <el-tag v-for="(middle, mIdx) in act.Middles"
-                                                                        :type="activeMiddle===middle+''?'warning':'info'"
-                                                                        :key="tagKey+'-'+actIdx+'-'+mIdx"
-                                                                        class="middle-name right" @click.stop="clickMiddle(middle+'')">
-                                                                    {{getSortName(doc.Middles[middle].Name)}}
-                                                                </el-tag>
+                                                            <div style="width:100%;display: flex;justify-content: space-between">
+                                                                <div>
+                                                                    <el-tag :type="tagType(act.Method)" class="route-method">
+                                                                        {{act.Method}}
+                                                                    </el-tag>
+                                                                    <span class="route">{{act.Route}}</span>
+                                                                </div>
+                                                                <div>
+                                                                    <el-tag v-for="(middle, mIdx) in act.Middles"
+                                                                            :type="activeMiddle===middle+''?'warning':'info'"
+                                                                            :key="tagKey+'-'+actIdx+'-'+mIdx"
+                                                                            class="middle-name" @click.stop="clickMiddle(middle+'')">
+                                                                        {{getSortName(doc.Middles[middle].Name)}}
+                                                                    </el-tag>
+                                                                </div>
                                                             </div>
                                                         </template>
                                                     </template>
@@ -70,7 +74,14 @@
                                                         <responses :resps="act.Responses"></responses>
                                                     </div>
                                                     <div class="toggle-container">
-                                                        <executes :action="act" :middles="getMiddles(act.Middles)"></executes>
+                                                        <executes :action="act" :middles="getMiddles(act.Middles)">
+                                                            <template slot="middleware" slot-scope="mid">
+                                                                <el-tag :type="activeMiddle===mid.data+''?'warning':'info'"
+                                                                        class="middle-name" @click.stop="clickMiddle(mid.data+'')">
+                                                                    {{getSortName(doc.Middles[mid.data].Name)}}
+                                                                </el-tag>
+                                                            </template>
+                                                        </executes>
                                                     </div>
                                                 </el-collapse-item>
                                             </el-collapse>
@@ -97,7 +108,7 @@
                                                     </template>
                                                 </template>
                                                 <div class="toggle-container">
-                                                    <params :params="middle.Params"></params>
+                                                    <params :params.sync="middle.Params"></params>
                                                 </div>
                                                 <div class="toggle-container">
                                                     <responses :resps="middle.Responses"></responses>
@@ -142,7 +153,8 @@
             }
         },
         watch:{
-            addr(val, oldVal){//普通的watch监听
+            // 监听数据地址，修改 axios 插件数据请求域名
+            addr(val, oldVal){
                 let m = val.match(/^http[s]*:\/\/[^/]+/);
                 this.$axios.defaults.baseURL = m ? m[0] : "";
             },
@@ -264,7 +276,7 @@
 
 <style>
     .el-header {
-        background-color: #B3C0D1;
+        background-color: #64d163;
         color: #333;
         line-height: 60px;
     }
@@ -316,21 +328,15 @@
         text-align: center;
         margin: 0 10px;
         font-weight: bold;
+        cursor: pointer;
     }
-
     .middle-desc {
         margin-left: 20px;
         color: #707371;
     }
-
     .controller-container {
         margin: 20px;
     }
-
-    .right {
-        float: right;
-    }
-
     .tag-title {
         margin: 60px 0 20px 0;
     }

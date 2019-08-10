@@ -17,11 +17,20 @@
                                         <span>{{field.Name}}</span>
                                         <span class="field-kind">{{field.Kind}}</span>
                                     </span>
-                                    <template v-if="field.input_type==='common'">
+                                    <template v-if="field.input_type==='time'">
                                         <el-input v-model="field.Value" class="param-input"></el-input>
                                     </template>
-                                    <template v-if="field.input_type==='bool'">
+                                    <template v-else-if="field.input_type==='file'">
+                                        <input @change="field.Value=$event" type="file" multiple="multiple" class="param-input"></input>
+                                    </template>
+                                    <template v-else-if="field.input_type==='common'">
+                                        <el-input v-model="field.Value" class="param-input"></el-input>
+                                    </template>
+                                    <template v-else-if="field.input_type==='bool'">
                                         <el-switch v-model="field.Value"></el-switch>
+                                    </template>
+                                    <template v-else-if="field.input_type==='slice'">
+                                        <slice-input :slice.sync="field.Value" class="param-input" placeholder="以 , 号串联数组"></slice-input>
                                     </template>
                                     <el-button type="text" v-if="field.Condition" @click="openDialog(field.Condition)" class="param-desc">验证数据</el-button>
                                     <span class="param-desc">{{field.Desc}}</span>
@@ -43,8 +52,12 @@
 </template>
 
 <script>
+    import sliceInput from "@/components/slice-input"
     export default {
         name: "params",
+        components:{
+            "slice-input": sliceInput,
+        },
         props: ["params"],
         data() {
             return {
@@ -59,14 +72,14 @@
                 get() {
                     return this.params
                 },
-                set(v) {
-                    this.$emit("update:params", v)
+                set(ps) {
+                    this.$emit("update:params", ps)
                 }
             }
         },
         created() {
-            if (this.params) {
-                for (let param of this.params) {
+            if (this.ps) {
+                for (let param of this.ps) {
                     for (let field of param.Fields) {
                         if (field.Condition) {
                             let c = field.Condition;
@@ -76,12 +89,15 @@
                                 });
                             }
                         }
-                        field.input_type = this.inputType(field.Kind)
+                        field.input_type = this.inputType(field.Kind);
                     }
                 }
             }
         },
         methods: {
+            changeSliceField(field) {
+                field.Value = field.slice?field.slice.split(","):[]
+            },
             addRule(field, rule) {
                 if (!this.rules[field]) {
                     this.$set(this.rules, field, [])
@@ -115,9 +131,8 @@
                     case "[]int64":
                     case "[]float32":
                     case "[]float64":
-                        return "slice-common";
                     case "[]bool":
-                        return "slice-bool";
+                        return "slice";
                     default:
                         return "invalid";
                 }

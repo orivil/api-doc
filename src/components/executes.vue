@@ -14,11 +14,12 @@
                     <template v-for="(request, idx) in requests">
                         <el-collapse-item :name="idx+''" :class="request.method" :key="idx">
                             <template slot="title">
-                                <div class="request-title">
-                                    <h4 style="margin: 0">
+                                <div style="width: 100%;display: flex;justify-content: space-between">
+                                    <div>
                                         <span class="method">{{request.method}}</span>
                                         <span class="url">{{request.url}}</span>
-                                    </h4>
+                                    </div>
+                                    <span style="margin-right: 20px">{{request.costTime}}</span>
                                 </div>
                             </template>
                             <div style="padding: 20px">
@@ -28,16 +29,21 @@
                                             :data="[request]"
                                             style="width: 100%">
                                         <el-table-column
-                                                label="Header"
-                                                width="700">
+                                                label="Header">
                                             <template slot-scope="scope">
                                                 <pre v-html="marshal_body(scope.row.headers)" class="header-body"></pre>
                                             </template>
                                         </el-table-column>
                                         <el-table-column
-                                                label="Body">
+                                                label="Queries">
                                             <template slot-scope="scope">
-                                                <pre v-html="marshal_body(scope.row.data)" class="response-body"></pre>
+                                                <pre v-html="marshal_body(scope.row.params)" class="response-body"></pre>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column
+                                                label="Data">
+                                            <template slot-scope="scope">
+                                                <pre v-html="marshal_body(scope.row.form)" class="response-body"></pre>
                                             </template>
                                         </el-table-column>
                                     </el-table>
@@ -55,8 +61,20 @@
                                             </template>
                                         </el-table-column>
                                         <el-table-column
-                                                label="Header"
-                                                width="600">
+                                                v-if="request.response.headers.middleware"
+                                                width="100">
+                                            <template slot="header">
+                                                <span>中间件</span>
+                                                <el-tooltip class="item" effect="dark" content="用于提示响应具体来源于哪一个中间件" placement="top">
+                                                    <i class="el-icon-question"></i>
+                                                </el-tooltip>
+                                            </template>
+                                            <template slot-scope="scope">
+                                                <slot name="middleware" :data="scope.row.headers.middleware"></slot>
+                                            </template>
+                                        </el-table-column>
+                                        <el-table-column
+                                                label="Header">
                                             <template slot-scope="scope">
                                                 <pre v-html="marshal_body(scope.row.headers)" class="header-body"></pre>
                                             </template>
@@ -109,23 +127,26 @@
                     url = url.replace("{" + field + "}", paths[field])
                 }
                 let headers = this.initParams(params, "header");
+                headers["Content-Type"] = this.action.ContentType;
                 let queries = this.initParams(params, "query");
-                let form = this.initFormData(this.initParams(params, "form"));
+                let form = this.initParams(params, "form");
+                let data = this.initFormData(form);
                 let request = {
                     method: this.action.Method,
                     url: url,
-                    data: form,
+                    form: form,
+                    data: data,
                     headers: headers,
                     params: queries,
                     paramsSerializer: function (params) {
                         return qs.stringify(params,{arrayFormat: 'brackets'})
                     },
-                    start: new Date(),
                 };
+                let startTime = new Date().getTime();
                 this.$axios(request).then(resp=> {
                     this.successCallback();
                     request.response = resp;
-                    request.end = new Date();
+                    request.costTime = (new Date().getTime() - startTime) + "ms";
                     this.requests.splice(0, 0, request);
                     this.activeName = "0";
                 }).catch((error) => {
@@ -134,7 +155,7 @@
                     } else {
                         this.$message.warning(error.message);
                     }
-                    request.end = new Date();
+                    request.costTime = (new Date().getTime() - startTime) + "ms";
                     this.requests.splice(0, 0, request);
                     this.activeName = "0";
                 });
@@ -157,7 +178,7 @@
                     let formData = new FormData();
                     for (let field in form) {
                         let v = form[field];
-                        if (!!v && !!v.target && !!v.target.files) {
+                        if (v && v.target && v.target.files) {
                             let ln = v.target.files.length;
                             form[field] = [];
                             for (let i = 0; i < ln; i++) {
@@ -194,7 +215,7 @@
         display: inline-block;
         float: right;
     }
-    .request-title .method {
+    .method {
         display: inline-block;
         margin-right: 20px;
         width: 80px;
@@ -221,6 +242,7 @@
         margin: 0;
         border-radius: 5px;
         padding: 20px;
+        overflow: auto;
         text-align: left;
         color: #f6f6f6;
         background-color: #464646;
@@ -228,6 +250,7 @@
     .header-body{
         margin: 0;
         border-radius: 5px;
+        overflow: auto;
         padding: 20px;
         text-align: left;
         color: #0f0f0f;

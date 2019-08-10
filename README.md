@@ -1,29 +1,10 @@
 # api-doc
 
-## Project setup
-```
-npm install
-```
+## 简介
+API 文档前端项目，用于查看以及测试 morgine API
 
-### Compiles and hot-reloads for development
-```
-npm run serve
-```
+## 使用
+直接下载，浏览器打开 `dist/index.html` 即可
 
-### Compiles and minifies for production
-```
-npm run build
-```
-
-### Run your tests
-```
-npm run test
-```
-
-### Lints and fixes files
-```
-npm run lint
-```
-
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## 贡献
+该项目包含源代码，熟悉前端的朋友可参与贡献/修复 bug

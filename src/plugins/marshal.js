@@ -1,9 +1,10 @@
 import Vue from 'vue'
+import Marked from 'marked'
 import "@/assets/css/marshal.css"
 
 Vue.use({
     install: function (Vue) {
-        Vue.prototype.marked = require('marked');
+        Vue.prototype.marked = Marked;
         Vue.prototype.marshal_body = (body)=> {
             if (!body) {
                 return '<span class="null">null</span>'
