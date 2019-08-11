@@ -23,10 +23,35 @@
     border-bottom: none;
 }
 .toggle-body-header{
-    cursor: pointer;
-    margin: 0;
-    padding: 20px
-}
+     cursor: pointer;
+     margin: 0;
+     padding: 20px
+ }
 .toggle-body-header i{
     margin-right: 10px;
+}
+.response-code{
+    color: #12560d;
+}
+.response-header{
+    color: #333356;
+}
+.data-body{
+    margin: 0;
+    border-radius: 5px;
+    max-height: 400px;
+    padding: 20px;
+    overflow: auto;
+    text-align: left;
+    color: #f6f6f6;
+    background-color: #464646;
+}
+.header-body{
+    margin: 0;
+    border-radius: 5px;
+    overflow: auto;
+    padding: 20px;
+    text-align: left;
+    color: #0f0f0f;
+    background-color: #f8f8f8;
 }

@@ -27,8 +27,8 @@
                         <el-table-column
                                 label="Body">
                             <template slot-scope="scope">
-                                <pre v-if="isHtmlBody(scope.row.Body)" v-text="scope.row.Body" class="response-body"></pre>
-                                <pre v-else v-html="marshal_body(scope.row.Body)" class="response-body"></pre>
+                                <pre v-if="isHtmlBody(scope.row.Body)" v-text="scope.row.Body" class="data-body"></pre>
+                                <pre v-else v-html="marshal_body(scope.row.Body)" class="data-body"></pre>
                             </template>
                         </el-table-column>
                     </el-table>

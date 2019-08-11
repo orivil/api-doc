@@ -37,13 +37,13 @@
                                         <el-table-column
                                                 label="Queries">
                                             <template slot-scope="scope">
-                                                <pre v-html="marshal_body(scope.row.params)" class="response-body"></pre>
+                                                <pre v-html="marshal_body(scope.row.params)" class="data-body"></pre>
                                             </template>
                                         </el-table-column>
                                         <el-table-column
                                                 label="Data">
                                             <template slot-scope="scope">
-                                                <pre v-html="marshal_body(scope.row.form)" class="response-body"></pre>
+                                                <pre v-html="marshal_body(scope.row.form)" class="data-body"></pre>
                                             </template>
                                         </el-table-column>
                                     </el-table>
@@ -82,7 +82,7 @@
                                         <el-table-column
                                                 label="Body">
                                             <template slot-scope="scope">
-                                                <pre v-html="marshal_body(scope.row.data)" class="response-body"></pre>
+                                                <pre v-html="marshal_body(scope.row.data)" class="data-body"></pre>
                                             </template>
                                         </el-table-column>
                                     </el-table>
@@ -226,34 +226,5 @@
         text-align: center;
         border: 1px solid #d6d6d6;
         border-radius: 4px;
-    }
-    .request-title .url {
-        overflow:hidden;
-        text-overflow:ellipsis;
-        white-space:nowrap
-    }
-    .response-code{
-        color: #12560d;
-    }
-    .response-header{
-        color: #333356;
-    }
-    .response-body{
-        margin: 0;
-        border-radius: 5px;
-        padding: 20px;
-        overflow: auto;
-        text-align: left;
-        color: #f6f6f6;
-        background-color: #464646;
-    }
-    .header-body{
-        margin: 0;
-        border-radius: 5px;
-        overflow: auto;
-        padding: 20px;
-        text-align: left;
-        color: #0f0f0f;
-        background-color: #f8f8f8;
     }
 </style>
