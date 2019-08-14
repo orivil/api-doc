@@ -265,8 +265,10 @@
             },
             getMiddles(middleNames) {
                 let middles = [];
-                for(let middle of middleNames) {
-                    middles.push(this.doc.Middles[middle])
+                if(middleNames) {
+                    for (let middle of middleNames) {
+                        middles.push(this.doc.Middles[middle])
+                    }
                 }
                 return middles
             }
