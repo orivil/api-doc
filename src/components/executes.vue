@@ -127,7 +127,7 @@
                     url = url.replace("{" + field + "}", paths[field])
                 }
                 let headers = this.initParams(params, "header");
-                headers["Content-Type"] = this.action.ContentType;
+                // headers["Content-Type"] = this.action.ContentType;
                 let queries = this.initParams(params, "query");
                 let form = this.initParams(params, "form");
                 let data = this.initFormData(form);
@@ -172,7 +172,6 @@
                 return ps
             },
             initFormData(form) {
-                let data = form;
                 if(this.action.ContentType === "multipart/form-data") {
                     let events = []; // 保留上传文件 input, 用于在上传成功时清除所选数据
                     let formData = new FormData();
@@ -202,9 +201,10 @@
                             events[i].target.value = '';
                         }
                     };
-                    data = formData;
+                    return formData;
+                } else {
+                    return qs.stringify(form)
                 }
-                return data
             }
         },
     }
