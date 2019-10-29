@@ -15,7 +15,7 @@
                                 width="400">
                             <template slot-scope="scope">
                                 <span class="response-code">{{scope.row.Code?scope.row.Code:200}}</span>
-                                <div v-if="scope.row.Description" class="desc" v-html="marked(scope.row.Desciption)"></div>
+                                <div v-if="scope.row.Description" class="desc" v-html="scope.row.Desciption?marked(scope.row.Desciption):''"></div>
                             </template>
                         </el-table-column>
                         <el-table-column

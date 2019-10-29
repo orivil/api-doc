@@ -100,7 +100,7 @@
     import qs from "qs";
     export default {
         name: "executes",
-        props:["action", "middles"],
+        props:["action", "middles", "token"],
         data(){
             return {
                 showBody: true,
@@ -127,6 +127,9 @@
                     url = url.replace("{" + field + "}", paths[field])
                 }
                 let headers = this.initParams(params, "header");
+                if(!headers.Authorization && this.token) {
+                    headers.Authorization = this.token
+                }
                 // headers["Content-Type"] = this.action.ContentType;
                 let queries = this.initParams(params, "query");
                 let form = this.initParams(params, "form");

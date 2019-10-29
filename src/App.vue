@@ -1,20 +1,27 @@
 <template>
     <div>
         <el-container>
-            <el-header style="text-align: right; font-size: 12px">
-                <el-form :inline="true">
-                    <el-autocomplete
-                            class="inline-input"
-                            v-model="addr"
-                            clearable
-                            @clear="clearAddr"
-                            style="width: 720px"
-                            :fetch-suggestions="fetchHistories"
-                            placeholder="请输入内容"
-                            @select="getData">
-                        <el-button slot="append" icon="el-icon-search" @click="getData"></el-button>
-                    </el-autocomplete>
-                </el-form>
+            <el-header style="padding: 0">
+                <el-menu mode="horizontal" background-color="#333a">
+                    <el-menu-item  style="float: right">
+                        <el-button v-if="!token" type="success" @click="signInDialogVisible=true">登录</el-button>
+                        <el-button v-if="token" type="warning" @click="logout">退出</el-button>
+                    </el-menu-item>
+                    <el-menu-item style="float: right">
+                        <el-form :inline="true">
+                            <el-autocomplete
+                                    v-model="addr"
+                                    clearable
+                                    @clear="clearAddr"
+                                    style="width: 720px"
+                                    :fetch-suggestions="fetchHistories"
+                                    placeholder="请输入内容"
+                                    @select="getData">
+                                <el-button slot="append" icon="el-icon-search" @click="getData"></el-button>
+                            </el-autocomplete>
+                        </el-form>
+                    </el-menu-item>
+                </el-menu>
             </el-header>
             <el-container>
                 <el-aside width="200px">
@@ -55,6 +62,7 @@
                                                                         {{act.Method}}
                                                                     </el-tag>
                                                                     <span class="route">{{act.Route}}</span>
+                                                                    <span class="desc">{{act.Name}}</span>
                                                                 </div>
                                                                 <div>
                                                                     <el-tag v-for="(middle, mIdx) in act.Middles"
@@ -68,13 +76,16 @@
                                                         </template>
                                                     </template>
                                                     <div class="toggle-container">
+                                                        <span class="desc" style="font-weight: bold">TRACE:</span> <span class="desc">{{act.Trace}}</span>
+                                                    </div>
+                                                    <div class="toggle-container">
                                                         <params :params="act.Params"></params>
                                                     </div>
                                                     <div class="toggle-container">
                                                         <responses :resps="act.Responses"></responses>
                                                     </div>
                                                     <div class="toggle-container">
-                                                        <executes :action="act" :middles="getMiddles(act.Middles)">
+                                                        <executes :token="token" :action="act" :middles="getMiddles(act.Middles)">
                                                             <template slot="middleware" slot-scope="mid">
                                                                 <el-tag :type="activeMiddle===mid.data+''?'warning':'info'"
                                                                         class="middle-name" @click.stop="clickMiddle(mid.data+'')">
@@ -104,7 +115,7 @@
                                                             @click.stop="clickMiddle(midIdx+'')">
                                                             {{getSortName(middle.Name)}}
                                                         </el-tag>
-                                                        <span class="middle-desc">{{middle.Desc}}</span>
+                                                        <span class="desc">{{middle.Desc}}</span>
                                                     </template>
                                                 </template>
                                                 <div class="toggle-container">
@@ -126,6 +137,20 @@
                 </el-main>
             </el-container>
         </el-container>
+        <el-dialog
+                title="设置 token"
+                :visible.sync="signInDialogVisible"
+                width="30%">
+            <el-form>
+                <el-form-item>
+                    <el-input v-model="dialogToken" placeholder="Authorization Token"></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="signInDialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="login">登录</el-button>
+            </span>
+        </el-dialog>
     </div>
 </template>
 
@@ -134,6 +159,7 @@
     import params from "@/components/params"
     import responses from "@/components/responses"
     import executes from "@/components/executes"
+    import {getToken, setToken, removeToken} from './utils/auth'
     export default {
         name: 'app',
         components: {
@@ -150,6 +176,9 @@
                 rootTags: [],
                 ready: false,
                 activeMiddle:"",
+                token: getToken()||"",
+                dialogToken: getToken()||"",
+                signInDialogVisible: false
             }
         },
         watch:{
@@ -160,6 +189,15 @@
             },
         },
         methods: {
+            login(){
+                this.token = this.dialogToken;
+                setToken(this.token);
+                this.signInDialogVisible = false
+            },
+            logout(){
+                this.token='';
+                removeToken()
+            },
             tagType(method) {
                 switch (method) {
                     case "GET":
@@ -248,13 +286,20 @@
                 return rootTags
             },
             getSortName(name) {
-                let matches = name.match(/\b(\w)/g);
-                if (matches) {
-                    let acronym = matches.join('');
-                    return acronym.toUpperCase();
-                } else {
-                    return name
+                let strs = name.split("|");
+                let title = "";
+                for(let str of strs) {
+                    let matches = str.match(/\b(\w)/g);
+                    if (matches) {
+                        let acronym = matches.join('');
+                        title += acronym.toUpperCase();
+                    } else {
+                        title += str
+                    }
+                    title += "|"
                 }
+                title = title.substring(0, title.lastIndexOf('|'));
+                return title
             },
             clickMiddle(middle){
                 if(this.activeMiddle===middle) {
@@ -278,9 +323,9 @@
 
 <style>
     .el-header {
-        background-color: #64d163;
-        color: #333;
-        line-height: 60px;
+        /*background-color: #64d163;*/
+        /*color: #333;*/
+        /*line-height: 60px;*/
     }
 
     .el-aside {
@@ -298,7 +343,7 @@
     #main-container {
         position: absolute;
         top: 60px;
-        left: 200px;
+        left: 250px;
         bottom: 0;
         overflow: auto;
         right: 0;
@@ -309,7 +354,8 @@
         position: absolute;
         left: 0;
         top: 60px;
-        width: 200px;
+        width: 250px;
+        overflow: scroll;
         border-right: solid 1px #e6e6e6;
         bottom: 0;
     }
@@ -332,7 +378,7 @@
         font-weight: bold;
         cursor: pointer;
     }
-    .middle-desc {
+    .desc {
         margin-left: 20px;
         color: #707371;
     }
