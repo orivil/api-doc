@@ -3,6 +3,9 @@
         <el-container>
             <el-header style="padding: 0">
                 <el-menu mode="horizontal" background-color="#333a">
+                    <div style="height: 60px;display: inline-flex;justify-content: center;align-items: center;margin-left: 30px">
+                        <h3 style="color: white;display: inline-block;margin: 0;padding: 0">API 技术文档</h3>
+                    </div>
                     <el-menu-item  style="float: right">
                         <el-button v-if="!token" type="success" @click="signInDialogVisible=true">登录</el-button>
                         <el-button v-if="token" type="warning" @click="logout">退出</el-button>
@@ -258,9 +261,9 @@
                 this.$axios.get(this.addr).then((resp) => {
                     if (resp && resp.data) {
                         let data = resp.data;
-                        if (data.doc) {
-                            let rootTags = this.initTags(data.doc.Actions, data.doc.Tags, null);
-                            this.doc = data.doc;
+                        if (data.Actions) {
+                            let rootTags = this.initTags(data.Actions, data.Tags, null);
+                            this.doc = data;
                             this.rootTags = rootTags;
                             this.ready = true;
                         }
